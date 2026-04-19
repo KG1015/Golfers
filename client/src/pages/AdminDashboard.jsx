@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../api/config.js';
-import { motion } from 'framer-motion';
-import { Users, BarChart3, Settings, Play, CheckCircle, AlertCircle, DollarSign } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, BarChart3, Settings, Play, CheckCircle, AlertCircle, DollarSign, X } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [draws, setDraws] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [activeTab, setActiveTab] = useState('stats');
 
   useEffect(() => {
     fetchAdminData();
@@ -28,8 +28,6 @@ const AdminDashboard = () => {
       setDraws(drawsRes.data);
     } catch (e) {
       console.error('Failed to fetch admin data');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -42,117 +40,154 @@ const AdminDashboard = () => {
       });
       fetchAdminData();
     } catch (e) {
-      alert('Failed to trigger draw');
+      alert('Draw failed');
     } finally {
       setProcessing(false);
     }
   };
 
-  if (loading) return <div className="p-12 text-center text-text-muted">Initializing Console...</div>;
-
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <div className="mb-12">
-        <h1 className="text-5xl font-black mb-2">Control <span className="text-secondary">Console</span></h1>
-        <p className="text-text-muted">Platform management and logic orchestration.</p>
-      </div>
-
-      {/* Stats Board */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        {[
-          { icon: <Users size={20} />, label: "Total Users", value: stats?.totalUsers || 0, color: "text-blue-400" },
-          { icon: <BarChart3 size={20} />, label: "Active Subs", value: stats?.activeSubs || 0, color: "text-primary" },
-          { icon: <DollarSign size={20} />, label: "Prize Pool", value: `$${stats?.totalPrizePool || 0}`, color: "text-secondary" },
-          { icon: <DollarSign size={20} />, label: "Charity Total", value: "$4,290", color: "text-emerald-400" }
-        ].map((s, i) => (
-          <motion.div 
-            key={i} 
-            className="glass p-6 rounded-2xl border border-white/5"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
+    <div className="container" style={{ padding: '40px 20px' }}>
+      <header className="flex justify-between items-end mb-12">
+        <div>
+          <h1 style={{ fontSize: '3rem', fontWeight: 900 }}>Admin <span className="brand-text">Control</span></h1>
+          <p style={{ color: 'var(--text-dim)', fontSize: '1.1rem' }}>Manage the guild and trigger monthly prize events.</p>
+        </div>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => setActiveTab('stats')} 
+            className={`btn ${activeTab === 'stats' ? 'btn-primary' : 'btn-outline'}`}
           >
-            <div className={`${s.color} mb-3 opacity-80`}>{s.icon}</div>
-            <div className="text-3xl font-bold mb-1">{s.value}</div>
-            <div className="text-text-muted text-xs font-bold uppercase tracking-widest">{s.label}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Draw Management */}
-        <div className="space-y-6">
-          <div className="glass p-8 rounded-3xl h-full border border-secondary/20">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <Settings size={24} className="text-secondary" />
-                Monthly Draw Control
-              </h2>
-              <button 
-                onClick={handleTriggerDraw}
-                disabled={processing}
-                className="bg-secondary text-background px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-              >
-                {processing ? 'Processing...' : <><Play size={18} /> Run Draw Engine</>}
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold uppercase text-text-muted tracking-widest ml-1">Historical Execution</h3>
-              {draws.slice(0, 5).map((draw, i) => (
-                <div key={draw._id} className="bg-surface/50 p-4 rounded-xl border border-white/5 flex justify-between items-center">
-                  <div>
-                    <div className="font-bold">Draw #{draw._id.slice(-6).toUpperCase()}</div>
-                    <div className="text-xs text-text-muted">{new Date(draw.drawDate).toLocaleDateString()}</div>
-                  </div>
-                  <div className="flex gap-2">
-                    {draw.winningNumbers.map(n => (
-                      <span key={n} className="w-8 h-8 rounded-lg bg-secondary/20 text-secondary flex items-center justify-center font-bold text-xs ring-1 ring-secondary/30">
-                        {n}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="text-primary font-bold text-sm">
-                    {draw.winners.length} Winners
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+            Insights
+          </button>
+          <button 
+            onClick={() => setActiveTab('users')} 
+            className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-outline'}`}
+          >
+            Members
+          </button>
         </div>
+      </header>
 
-        {/* User Management List */}
-        <div className="glass p-8 rounded-3xl border border-white/10">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
-            <Users size={24} className="text-primary" />
-            Registry
-          </h2>
-          <div className="space-y-4 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
-            {users.map(u => (
-              <div key={u._id} className="p-4 bg-surface-light/30 rounded-xl border border-white/5 flex justify-between items-center group hover:bg-surface-light/50 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-surface rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-white/10">
-                    {u.name[0]}
-                  </div>
-                  <div>
-                    <div className="font-bold flex items-center gap-2">
-                      {u.name}
-                      {u.subscription.status === 'active' && <CheckCircle size={14} className="text-primary" />}
-                    </div>
-                    <div className="text-xs text-text-muted uppercase font-bold tracking-tighter">
-                      Contributor to {u.charity?.name || 'N/A'}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-primary text-xs font-bold">{u.scores.length}/5 Scores</div>
-                  <div className="text-[10px] text-text-muted">{u.email}</div>
-                </div>
+      {activeTab === 'stats' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          {/* Stats Grid */}
+          <div className="grid-3" style={{ marginBottom: '3rem' }}>
+            <div className="card">
+              <div className="flex items-center gap-2 mb-4" style={{ color: 'var(--brand)' }}>
+                <Users size={18} />
+                <span style={{ fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.1em' }}>TOTAL HEROES</span>
               </div>
-            ))}
+              <div style={{ fontSize: '3.5rem', fontWeight: 900 }}>{stats?.totalUsers || 0}</div>
+            </div>
+            <div className="card">
+              <div className="flex items-center gap-2 mb-4" style={{ color: 'var(--secondary)' }}>
+                <DollarSign size={18} />
+                <span style={{ fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.1em' }}>ACTIVE SUBS</span>
+              </div>
+              <div style={{ fontSize: '3.5rem', fontWeight: 900 }}>{stats?.activeSubscriptions || 0}</div>
+            </div>
+            <div className="card">
+              <div className="flex items-center gap-2 mb-4" style={{ color: 'var(--text-dim)' }}>
+                <BarChart3 size={18} />
+                <span style={{ fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.1em' }}>REVENUE</span>
+              </div>
+              <div style={{ fontSize: '3.5rem', fontWeight: 900 }}>${(stats?.activeSubscriptions * 29.99 || 0).toFixed(0)}</div>
+            </div>
           </div>
-        </div>
-      </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem' }}>
+            {/* Draw History */}
+            <div className="card" style={{ padding: '0' }}>
+              <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'between' }}>
+                <h3 style={{ fontSize: '1.25rem' }}>Draw Records</h3>
+              </div>
+              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: 'var(--surface)', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                    <tr>
+                      <th style={{ padding: '1rem 2rem', textAlign: 'left' }}>DATE</th>
+                      <th style={{ padding: '1rem 2rem', textAlign: 'left' }}>WINNING NOS</th>
+                      <th style={{ padding: '1rem 2rem', textAlign: 'left' }}>PRIZE POOL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {draws.map(d => (
+                      <tr key={d._id} style={{ borderTop: '1px solid var(--border)' }}>
+                        <td style={{ padding: '1rem 2rem', fontSize: '0.9rem' }}>{new Date(d.date).toLocaleDateString()}</td>
+                        <td style={{ padding: '1rem 2rem' }}>
+                          <div className="flex gap-1">
+                            {d.winningNumbers.map((n, i) => (
+                              <span key={i} style={{ width: '28px', height: '28px', background: 'var(--brand)', color: '#000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800 }}>
+                                {n}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem 2rem', fontWeight: 700 }}>${d.prizePool.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="card" style={{ background: 'linear-gradient(135deg, var(--surface) 0%, #1a1a1a 100%)' }}>
+              <h3 style={{ marginBottom: '1.5rem' }}>Next Monthly Event</h3>
+              <div style={{ padding: '2rem', background: 'rgba(0,234,140,0.03)', borderRadius: '16px', border: '1px dashed var(--brand)', textAlign: 'center', marginBottom: '2rem' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--brand)', fontWeight: 800, marginBottom: '0.5rem' }}>CURRENT POOL ESTIMATE</div>
+                <div style={{ fontSize: '3rem', fontWeight: 900 }}>${(stats?.activeSubscriptions * 15 || 0).toFixed(2)}</div>
+              </div>
+              <button 
+                onClick={handleTriggerDraw} 
+                disabled={processing}
+                className="btn btn-primary" 
+                style={{ width: '100%', padding: '1.2rem' }}
+              >
+                {processing ? 'Calculating Scores...' : <><Play size={18} fill="currentColor" /> Initialize Draw Now</>}
+              </button>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textAlign: 'center', marginTop: '1rem' }}>
+                This will process all active performance scores against new random targets.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {activeTab === 'users' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card" style={{ padding: '0' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+              <tr>
+                <th style={{ padding: '1.5rem 2rem', textAlign: 'left' }}>MEMBER</th>
+                <th style={{ padding: '1.5rem 2rem', textAlign: 'left' }}>CHARITY</th>
+                <th style={{ padding: '1.5rem 2rem', textAlign: 'left' }}>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map(u => (
+                <tr key={u._id} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '1.2rem 2rem' }}>
+                    <div style={{ fontWeight: 700 }}>{u.name}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>{u.email}</div>
+                  </td>
+                  <td style={{ padding: '1.2rem 2rem', fontSize: '0.9rem' }}>{u.supportedCharity?.name || '---'}</td>
+                  <td style={{ padding: '1.2rem 2rem' }}>
+                    <span style={{ 
+                      padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 900,
+                      background: u.subscription?.status === 'active' ? 'rgba(0,234,140,0.1)' : 'rgba(255,77,77,0.1)',
+                      color: u.subscription?.status === 'active' ? 'var(--brand)' : 'var(--error)'
+                    }}>
+                      {u.subscription?.status?.toUpperCase() || 'INACTIVE'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </motion.div>
+      )}
     </div>
   );
 };

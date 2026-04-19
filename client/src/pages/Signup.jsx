@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API_BASE_URL from '../api/config.js';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Heart, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, Heart } from 'lucide-react';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -40,7 +40,7 @@ const Signup = () => {
     try {
       await register({
         ...formData,
-        subscription: { status: 'active', plan: formData.plan } // Mocking active sub for "easy" req
+        subscription: { status: 'active', plan: formData.plan }
       });
       navigate('/dashboard');
     } catch (err) {
@@ -49,109 +49,114 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[90vh] px-6 py-12">
+    <div className="container flex justify-center items-center" style={{ minHeight: 'calc(100vh - 80px)', padding: '40px 20px' }}>
       <motion.div 
-        className="glass p-10 rounded-3xl w-full max-w-2xl border border-white/10"
+        className="card" 
+        style={{ width: '100%', maxWidth: '600px' }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h2 className="text-4xl font-extrabold mb-2">Create Account</h2>
-        <p className="text-text-muted mb-8 text-lg">Join the community driving change through golf.</p>
+        <h2 className="text-center mb-4" style={{ fontSize: '2.5rem' }}>Join the Guild</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--text-dim)' }}>
+          Start tracking your performance and making an impact.
+        </p>
         
-        {error && <div className="bg-error/10 text-error border border-error/20 p-4 rounded-xl mb-6 text-sm">{error}</div>}
+        {error && <div className="error-msg">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold ml-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                <input 
-                  type="text" 
-                  className="w-full bg-surface border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-text outline-none focus:border-primary/50 transition-all"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                />
-              </div>
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div className="left-col">
+            <div className="input-group">
+              <label className="input-label">Full Name</label>
+              <input 
+                type="text" 
+                className="input-field"
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                required
+              />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold ml-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                <input 
-                  type="email" 
-                  className="w-full bg-surface border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-text outline-none focus:border-primary/50 transition-all"
-                  placeholder="hero@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  required
-                />
-              </div>
+            <div className="input-group">
+              <label className="input-label">Email Address</label>
+              <input 
+                type="email" 
+                className="input-field"
+                placeholder="hero@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
+              />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold ml-1">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                <input 
-                  type="password" 
-                  className="w-full bg-surface border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-text outline-none focus:border-primary/50 transition-all"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  required
-                />
-              </div>
+            <div className="input-group">
+              <label className="input-label">Password</label>
+              <input 
+                type="password" 
+                className="input-field"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+              />
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold ml-1 flex items-center gap-2"><Heart size={16} className="text-primary" /> Supported Charity</label>
+          <div className="right-col">
+            <div className="input-group">
+              <label className="input-label">Support a Cause</label>
               <select 
-                className="w-full bg-surface border border-white/5 rounded-2xl py-4 px-4 text-text outline-none focus:border-primary/50 transition-all appearance-none cursor-pointer"
+                className="input-field"
                 value={formData.charityId}
                 onChange={(e) => setFormData({...formData, charityId: e.target.value})}
                 required
+                style={{ appearance: 'none', cursor: 'pointer' }}
               >
-                <option value="">Select a charity</option>
+                <option value="">Select Charity</option>
                 {charities.map(c => (
                   <option key={c._id} value={c._id}>{c.name}</option>
                 ))}
               </select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold ml-1 flex items-center gap-2"><ShieldCheck size={16} className="text-secondary" /> Subscription Plan</label>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="input-group">
+              <label className="input-label">Choose Plan</label>
+              <div className="flex gap-4">
                 <div 
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${formData.plan === 'monthly' ? 'border-primary bg-primary/10' : 'border-white/5 bg-surface-light'}`}
+                  className="card" 
+                  style={{ 
+                    flex: 1, padding: '1rem', cursor: 'pointer', 
+                    borderColor: formData.plan === 'monthly' ? 'var(--brand)' : 'var(--border)',
+                    background: formData.plan === 'monthly' ? 'rgba(0,234,140,0.05)' : 'var(--surface-light)'
+                  }}
                   onClick={() => setFormData({...formData, plan: 'monthly'})}
                 >
-                  <div className="font-bold">Monthly</div>
-                  <div className="text-text-muted text-xs">$29.99/mo</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.8rem' }}>Monthly</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>$29.99</div>
                 </div>
                 <div 
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${formData.plan === 'yearly' ? 'border-secondary bg-secondary/10' : 'border-white/5 bg-surface-light'}`}
+                  className="card" 
+                  style={{ 
+                    flex: 1, padding: '1rem', cursor: 'pointer',
+                    borderColor: formData.plan === 'yearly' ? 'var(--brand)' : 'var(--border)',
+                    background: formData.plan === 'yearly' ? 'rgba(0,234,140,0.05)' : 'var(--surface-light)'
+                  }}
                   onClick={() => setFormData({...formData, plan: 'yearly'})}
                 >
-                  <div className="font-bold">Yearly</div>
-                  <div className="text-text-muted text-xs">$299.99/yr</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.8rem' }}>Yearly</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>$299.99</div>
                 </div>
               </div>
             </div>
 
-            <button className="w-full bg-primary text-background font-extrabold py-4 rounded-2xl mt-4 shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:scale-[1.02] active:scale-95 transition-all">
-              Register & Subscribe
+            <button className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
+              Register & Begin
             </button>
           </div>
         </form>
 
-        <p className="mt-8 text-center text-text-muted text-sm">
-          Already have an account? <Link to="/login" className="text-primary font-bold no-underline">Log in</Link>
+        <p className="text-center mt-8" style={{ fontSize: '0.9rem', color: 'var(--text-dim)' }}>
+          Already a Hero? <Link to="/login" className="brand-text" style={{ fontWeight: 700 }}>Login here</Link>
         </p>
       </motion.div>
     </div>

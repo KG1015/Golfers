@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Mail, Lock, LogIn } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,55 +22,52 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh] px-6">
+    <div className="container flex justify-center items-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
       <motion.div 
-        className="glass p-10 rounded-3xl w-full max-w-md border border-white/10"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        className="card" 
+        style={{ width: '100%', maxWidth: '440px' }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
       >
-        <h2 className="text-4xl font-extrabold mb-2 text-center">Welcome Back</h2>
-        <p className="text-text-muted text-center mb-8">Sign in to track your scores and impact.</p>
+        <h2 className="text-center mb-4" style={{ fontSize: '2.5rem' }}>Login</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--text-dim)' }}>
+          Welcome back, Hero. Track your impact.
+        </p>
         
-        {error && <div className="bg-error/10 text-error border border-error/20 p-4 rounded-xl mb-6 text-sm">{error}</div>}
+        {error && <div className="error-msg">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold ml-1">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-              <input 
-                type="email" 
-                className="w-full bg-surface border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-text outline-none focus:border-primary/50 transition-all"
-                placeholder="hero@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label className="input-label">Email Address</label>
+            <input 
+              type="email" 
+              className="input-field"
+              placeholder="hero@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold ml-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-              <input 
-                type="password" 
-                className="w-full bg-surface border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-text outline-none focus:border-primary/50 transition-all"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+          <div className="input-group">
+            <label className="input-label">Password</label>
+            <input 
+              type="password" 
+              className="input-field"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
 
-          <button className="w-full bg-primary text-background font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(0,255,157,0.4)] transition-all">
+          <button className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
             <LogIn size={20} /> Sign In
           </button>
         </form>
 
-        <p className="text-center mt-8 text-text-muted text-sm">
-          Don't have an account? <Link to="/signup" className="text-primary font-bold no-underline hover:underline">Sign up for free</Link>
+        <p className="text-center mt-8" style={{ fontSize: '0.9rem', color: 'var(--text-dim)' }}>
+          New to Digital Heroes? <Link to="/signup" className="brand-text" style={{ fontWeight: 700 }}>Join now</Link>
         </p>
       </motion.div>
     </div>

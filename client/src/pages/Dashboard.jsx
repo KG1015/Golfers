@@ -3,14 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API_BASE_URL from '../api/config.js';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Calendar, Trophy, Heart, CreditCard, ChevronRight, X } from 'lucide-react';
+import { Plus, Calendar, Trophy, Heart, CreditCard, X } from 'lucide-react';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [scores, setScores] = useState([]);
   const [showScoreModal, setShowScoreModal] = useState(false);
-  const [newScore, setNewScore] = useState({ value: '', date: new Date().toISOString().split('T')[0] });
-  const [error, setError] = useState('');
+  const [newScore, setNewScore] = useState({ score: 36, date: new Date().toISOString().split('T')[0] });
 
   useEffect(() => {
     fetchScores();
@@ -37,190 +36,140 @@ const Dashboard = () => {
       });
       setShowScoreModal(false);
       fetchScores();
-      setNewScore({ value: '', date: new Date().toISOString().split('T')[0] });
-      setError('');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to add score');
+    } catch (e) {
+      console.error('Failed to add score');
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <div className="flex flex-col md:flex-row gap-8">
-        
-        {/* Left Column: Profile & Subs */}
-        <div className="md:w-1/3 space-y-6">
-          <motion.div 
-            className="glass p-8 rounded-3xl"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center text-primary text-2xl font-bold">
-                {user?.name[0]}
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">{user?.name}</h2>
-                <div className="flex items-center gap-2 text-text-muted text-sm">
-                  <CreditCard size={14} />
-                  {user?.subscription.plan.toUpperCase()} PLAN
-                </div>
-              </div>
-            </div>
+    <div className="container" style={{ padding: '40px 20px' }}>
+      {/* Header */}
+      <header className="flex justify-between items-end mb-8">
+        <div>
+          <h1 style={{ fontSize: '3rem', fontWeight: 900 }}>Welcome, <span className="brand-text">{user?.name}</span></h1>
+          <p style={{ color: 'var(--text-dim)', fontSize: '1.1rem' }}>Your performance and impact at a glance.</p>
+        </div>
+        <button onClick={() => setShowScoreModal(true)} className="btn btn-primary">
+          <Plus size={20} /> Log New Score
+        </button>
+      </header>
 
-            <div className="space-y-4">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-text-muted">Status</span>
-                <span className="bg-success/20 text-success px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                  {user?.subscription.status}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-text-muted">Renewal Date</span>
-                <span>April 24, 2026</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Charity Card */}
-          <motion.div 
-            className="glass p-8 rounded-3xl border border-primary/20"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <div className="flex items-center gap-2 text-primary mb-4">
-              <Heart size={20} fill="currentColor" />
-              <span className="font-bold uppercase tracking-widest text-xs">Giving Back</span>
-            </div>
-            <h3 className="text-xl font-bold mb-2">Supporting {user?.charity?.name || 'Local Charities'}</h3>
-            <p className="text-sm text-text-muted mb-4">You are contributing <span className="text-text font-bold">{user?.contributionPercentage}%</span> of your sub fee.</p>
-            <button className="w-full bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm font-semibold transition-all">
-              Change Charity
-            </button>
-          </motion.div>
-
-          {/* Winnings Card */}
-          <motion.div 
-            className="glass p-8 rounded-3xl bg-gradient-to-br from-surface to-surface-light border border-secondary/20"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="flex items-center gap-2 text-secondary mb-4">
-              <Trophy size={20} />
-              <span className="font-bold uppercase tracking-widest text-xs">Rewards</span>
-            </div>
-            <div className="text-4xl font-extrabold mb-1">${user?.totalWinnings || 0}</div>
-            <div className="text-sm text-text-muted">Total Lifetime Winnings</div>
-          </motion.div>
+      {/* Grid */}
+      <div className="grid-3" style={{ marginBottom: '3rem' }}>
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="flex items-center gap-2" style={{ color: 'var(--brand)' }}>
+            <Trophy size={20} />
+            <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.1em' }}>ACTIVE SCORES</span>
+          </div>
+          <div style={{ fontSize: '3rem', fontWeight: 900 }}>{scores.length}<span style={{ fontSize: '1rem', color: 'var(--text-dim)', marginLeft: '0.5rem' }}>/ 5</span></div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>Only your latest 5 scores are active for draws.</p>
         </div>
 
-        {/* Right Column: Scores */}
-        <div className="md:w-2/3 space-y-6">
-          <motion.div 
-            className="glass p-8 rounded-3xl h-full min-h-[500px]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h2 className="text-3xl font-extrabold">Recent Performance</h2>
-                <p className="text-text-muted">Latest 5 scores are active for the current draw.</p>
-              </div>
-              <button 
-                onClick={() => setShowScoreModal(true)}
-                className="bg-primary text-background p-3 rounded-2xl hover:scale-105 transition-all shadow-lg"
-              >
-                <Plus size={24} />
-              </button>
-            </div>
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="flex items-center gap-2" style={{ color: 'var(--secondary)' }}>
+            <Heart size={20} />
+            <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.1em' }}>TOTAL IMPACT</span>
+          </div>
+          <div style={{ fontSize: '3rem', fontWeight: 900 }}>$12.50</div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>Supporting {user?.supportedCharity?.name || 'your cause'}.</p>
+        </div>
 
-            <div className="space-y-4">
-              {scores.length === 0 ? (
-                <div className="text-center py-20 bg-surface/30 rounded-3xl border border-dashed border-white/5">
-                  <p className="text-text-muted">No scores recorded yet.</p>
-                </div>
-              ) : (
-                scores.map((score, i) => (
-                  <motion.div 
-                    key={score._id} 
-                    className="flex items-center justify-between p-6 bg-surface-light/50 rounded-2xl border border-white/5 hover:border-white/10 transition-all"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 bg-background rounded-2xl flex items-center justify-center text-3xl font-black text-primary border border-primary/20">
-                        {score.value}
-                      </div>
-                      <div>
-                        <div className="font-bold text-lg">Stableford Score</div>
-                        <div className="flex items-center gap-2 text-text-muted text-sm">
-                          <Calendar size={14} />
-                          {new Date(score.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                        </div>
-                      </div>
-                    </div>
-                    <ChevronRight className="text-text-muted" />
-                  </motion.div>
-                ))
-              )}
-            </div>
-            
-            {scores.length >= 5 && (
-              <p className="mt-6 text-xs text-text-muted text-center italic">
-                Adding a new score will automatically replace your oldest entry.
-              </p>
-            )}
-          </motion.div>
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="flex items-center gap-2" style={{ color: 'var(--text-dim)' }}>
+            <CreditCard size={20} />
+            <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.1em' }}>SUBSCRIPTION</span>
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{user?.subscription?.plan?.toUpperCase() || 'MONTHLY'}</div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--brand)', fontWeight: 700 }}>ACTIVE</div>
         </div>
       </div>
 
-      {/* Score Modal */}
+      {/* Scores Table */}
+      <div className="card" style={{ padding: '0' }}>
+        <div style={{ padding: '1.5rem 2.5rem', borderBottom: '1px solid var(--border)' }}>
+          <h3 style={{ fontSize: '1.5rem' }}>Recent Performance</h3>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ textAlign: 'left', color: 'var(--text-dim)', fontSize: '0.85rem' }}>
+                <th style={{ padding: '1.2rem 2.5rem' }}>DATE</th>
+                <th style={{ padding: '1.2rem 2.5rem' }}>STABLEFORD SCORE</th>
+                <th style={{ padding: '1.2rem 2.5rem' }}>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scores.map((s, i) => (
+                <tr key={s._id} style={{ borderTop: '1px solid var(--border)', background: i === 0 ? 'rgba(0,234,140,0.02)' : 'transparent' }}>
+                  <td style={{ padding: '1.2rem 2.5rem' }}>
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} color="var(--text-dim)" />
+                      {new Date(s.date).toLocaleDateString()}
+                    </div>
+                  </td>
+                  <td style={{ padding: '1.2rem 2.5rem', fontWeight: 800, fontSize: '1.1rem' }}>{s.score}</td>
+                  <td style={{ padding: '1.2rem 2.5rem' }}>
+                    <span style={{ 
+                      padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 900,
+                      background: i < 5 ? 'rgba(0,234,140,0.1)' : 'rgba(255,255,255,0.05)',
+                      color: i < 5 ? 'var(--brand)' : 'var(--text-dim)'
+                    }}>
+                      {i < 5 ? 'ACTIVE' : 'EXPIRED'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {scores.length === 0 && (
+                <tr>
+                  <td colSpan="3" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-dim)' }}>
+                    No scores recorded yet. Time to hit the course!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal */}
       <AnimatePresence>
         {showScoreModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-sm">
+          <div style={{ 
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+            background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 
+          }}>
             <motion.div 
-              className="glass p-8 rounded-3xl w-full max-w-md relative"
+              className="card" style={{ width: '100%', maxWidth: '400px' }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
             >
-              <button onClick={() => setShowScoreModal(false)} className="absolute top-6 right-6 text-text-muted hover:text-text">
-                <X size={24} />
-              </button>
-              <h3 className="text-2xl font-bold mb-6">Enter Golf Score</h3>
-              
-              {error && <div className="bg-error/10 text-error border border-error/20 p-4 rounded-xl mb-6 text-sm">{error}</div>}
-
-              <form onSubmit={handleAddScore} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">Stableford Result (1-45)</label>
+              <div className="flex justify-between items-center mb-8">
+                <h3 style={{ fontSize: '1.5rem' }}>Log Score</h3>
+                <X style={{ cursor: 'pointer' }} onClick={() => setShowScoreModal(false)} />
+              </div>
+              <form onSubmit={handleAddScore}>
+                <div className="input-group">
+                  <label className="input-label">Stableford Points (1-45)</label>
                   <input 
-                    type="number" 
-                    min="1" 
-                    max="45"
-                    className="w-full bg-surface border border-white/10 rounded-2xl py-4 px-4 text-text outline-none focus:border-primary/50 text-2xl font-bold text-center"
-                    value={newScore.value}
-                    onChange={(e) => setNewScore({...newScore, value: e.target.value})}
-                    required
-                    placeholder="--"
+                    type="number" className="input-field" min="1" max="45"
+                    value={newScore.score} 
+                    onChange={(e) => setNewScore({...newScore, score: e.target.value})}
+                    required 
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">Match Date</label>
+                <div className="input-group">
+                  <label className="input-label">Round Date</label>
                   <input 
-                    type="date" 
-                    className="w-full bg-surface border border-white/10 rounded-2xl py-4 px-4 text-text outline-none focus:border-primary/50 transition-all"
+                    type="date" className="input-field" 
                     value={newScore.date}
-                    max={new Date().toISOString().split('T')[0]}
                     onChange={(e) => setNewScore({...newScore, date: e.target.value})}
-                    required
+                    required 
                   />
                 </div>
-                <button className="w-full bg-primary text-background font-bold py-4 rounded-2xl hover:shadow-lg transition-all">
-                  Confirm Entry
+                <button className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+                  Submit Performance
                 </button>
               </form>
             </motion.div>
