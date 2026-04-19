@@ -110,9 +110,9 @@ const Signup = () => {
                 value={formData.charityId}
                 onChange={(e) => setFormData({...formData, charityId: e.target.value})}
                 required
-                style={{ appearance: 'none', cursor: 'pointer' }}
+                style={{ cursor: 'pointer' }}
               >
-                <option value="">Select Charity</option>
+                <option value="">{charities.length > 0 ? 'Select Charity' : 'Loading Causes...'}</option>
                 {charities.map(c => (
                   <option key={c._id} value={c._id}>{c.name}</option>
                 ))}
