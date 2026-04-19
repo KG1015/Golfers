@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import API_BASE_URL from '../api/config';
+import API_BASE_URL from '../api/config.js';
 import { motion } from 'framer-motion';
 import { Users, BarChart3, Settings, Play, CheckCircle, AlertCircle, DollarSign } from 'lucide-react';
 

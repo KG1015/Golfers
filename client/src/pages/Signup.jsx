@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import API_BASE_URL from '../api/config';
+import API_BASE_URL from '../api/config.js';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Heart, ShieldCheck } from 'lucide-react';
 

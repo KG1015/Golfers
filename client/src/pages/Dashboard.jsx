@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import API_BASE_URL from '../api/config';
+import API_BASE_URL from '../api/config.js';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Calendar, Trophy, Heart, CreditCard, ChevronRight, X } from 'lucide-react';
 
