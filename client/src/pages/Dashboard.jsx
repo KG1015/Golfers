@@ -9,7 +9,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [scores, setScores] = useState([]);
   const [showScoreModal, setShowScoreModal] = useState(false);
-  const [newScore, setNewScore] = useState({ score: 36, date: new Date().toISOString().split('T')[0] });
+  const [newScore, setNewScore] = useState({ value: 36, date: new Date().toISOString().split('T')[0] });
 
   useEffect(() => {
     fetchScores();
@@ -107,7 +107,7 @@ const Dashboard = () => {
                       {new Date(s.date).toLocaleDateString()}
                     </div>
                   </td>
-                  <td style={{ padding: '1.2rem 2.5rem', fontWeight: 800, fontSize: '1.1rem' }}>{s.score}</td>
+                  <td style={{ padding: '1.2rem 2.5rem', fontWeight: 800, fontSize: '1.1rem' }}>{s.value}</td>
                   <td style={{ padding: '1.2rem 2.5rem' }}>
                     <span style={{ 
                       padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 900,
@@ -154,8 +154,8 @@ const Dashboard = () => {
                   <label className="input-label">Stableford Points (1-45)</label>
                   <input 
                     type="number" className="input-field" min="1" max="45"
-                    value={newScore.score} 
-                    onChange={(e) => setNewScore({...newScore, score: e.target.value})}
+                    value={newScore.value} 
+                    onChange={(e) => setNewScore({...newScore, value: e.target.value})}
                     required 
                   />
                 </div>
