@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [scores, setScores] = useState([]);
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [newScore, setNewScore] = useState({ value: 36, date: new Date().toISOString().split('T')[0] });
+  const [modalError, setModalError] = useState('');
 
   useEffect(() => {
     fetchScores();
@@ -29,15 +30,19 @@ const Dashboard = () => {
 
   const handleAddScore = async (e) => {
     e.preventDefault();
+    setModalError('');
     const token = localStorage.getItem('token');
     try {
-      await axios.post(`${API_BASE_URL}/scores`, newScore, {
+      await axios.post(`${API_BASE_URL}/scores`, {
+        ...newScore,
+        value: Number(newScore.value)
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowScoreModal(false);
       fetchScores();
     } catch (e) {
-      console.error('Failed to add score');
+      setModalError(e.response?.data?.error || 'Failed to add score. Please try again.');
     }
   };
 
@@ -149,6 +154,9 @@ const Dashboard = () => {
                 <h3 style={{ fontSize: '1.5rem' }}>Log Score</h3>
                 <X style={{ cursor: 'pointer' }} onClick={() => setShowScoreModal(false)} />
               </div>
+
+              {modalError && <div className="error-msg">{modalError}</div>}
+
               <form onSubmit={handleAddScore}>
                 <div className="input-group">
                   <label className="input-label">Stableford Points (1-45)</label>
