@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Hash password before saving
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function() {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
@@ -33,7 +33,6 @@ UserSchema.pre('save', async function(next) {
   if (this.scores.length > 5) {
     this.scores = this.scores.sort((a, b) => b.date - a.date).slice(0, 5);
   }
-  next();
 });
 
 UserSchema.methods.comparePassword = async function(candidatePassword) {
