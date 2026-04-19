@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import { motion } from 'framer-motion';
 import { Users, BarChart3, Settings, Play, CheckCircle, AlertCircle, DollarSign } from 'lucide-react';
 
@@ -18,9 +19,9 @@ const AdminDashboard = () => {
     const token = localStorage.getItem('token');
     try {
       const [statsRes, usersRes, drawsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:5000/api/admin/users', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:5000/api/draws')
+        axios.get(`${API_BASE_URL}/admin/stats`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_BASE_URL}/admin/users`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_BASE_URL}/draws`)
       ]);
       setStats(statsRes.data);
       setUsers(usersRes.data);
@@ -36,7 +37,7 @@ const AdminDashboard = () => {
     const token = localStorage.getItem('token');
     setProcessing(true);
     try {
-      await axios.post('http://localhost:5000/api/draws/trigger', { mode: 'random' }, {
+      await axios.post(`${API_BASE_URL}/draws/trigger`, { mode: 'random' }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchAdminData();

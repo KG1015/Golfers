@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Heart, ShieldCheck } from 'lucide-react';
 
@@ -21,7 +22,7 @@ const Signup = () => {
   useEffect(() => {
     const fetchCharities = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/charities');
+        const res = await axios.get(`${API_BASE_URL}/charities`);
         setCharities(res.data);
       } catch (e) {
         console.error('Failed to fetch charities');

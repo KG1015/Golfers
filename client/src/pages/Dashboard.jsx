@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import API_BASE_URL from '../api/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Calendar, Trophy, Heart, CreditCard, ChevronRight, X } from 'lucide-react';
 
@@ -18,7 +19,7 @@ const Dashboard = () => {
   const fetchScores = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await axios.get('http://localhost:5000/api/scores', {
+      const res = await axios.get(`${API_BASE_URL}/scores`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setScores(res.data);
@@ -31,7 +32,7 @@ const Dashboard = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:5000/api/scores', newScore, {
+      await axios.post(`${API_BASE_URL}/scores`, newScore, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowScoreModal(false);
